@@ -19,6 +19,7 @@ const render = employees => {
     .map(intern => renderIntern(intern))
   );
 
+    console.log('this is the html we build with the mangerrr!!!', html)
   return renderMain(html.join(""));
 
 };
@@ -55,7 +56,11 @@ const renderIntern = intern => {
 
 const renderMain = html => {
   const template = fs.readFileSync(path.resolve(templatesDir, "main.html"), "utf8");
-  return replacePlaceholders(template, "team", html);
+  
+  var finishedHtml =  replacePlaceholders(template, "team", html);
+  console.log('finishHtml', finishedHtml)
+  return finishedHtml
+
 };
 
 const replacePlaceholders = (template, placeholder, value) => {
