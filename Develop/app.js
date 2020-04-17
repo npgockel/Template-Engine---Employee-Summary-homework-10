@@ -1,19 +1,19 @@
 const Manager = require("./lib/Manager");
 const Engineer = require("./lib/Engineer");
 const Intern = require("./lib/Intern");
+const Employee = require("./lib/Employee");
 const inquirer = require("inquirer");
 const path = require("path");
 const fs = require("fs");
 
 const OUTPUT_DIR = path.resolve(__dirname, "output");
 const outputPath = path.join(OUTPUT_DIR, "team.html");
-console.log(OUTPUT_DIR)
+console.log(OUTPUT_DIR);
 console.log(outputPath);
 
 const render = require("./lib/htmlRenderer");
 
-var teamArray =[]
-
+var teamArray = [];
 
 function starterQ() {
   var questions = [
@@ -21,7 +21,7 @@ function starterQ() {
       type: "list",
       name: "employeeType",
       message: "Are you an Engineer, a Intern, or a Manager?",
-      choices: ["Engineer", "Intern", "Manager"],
+      choices: ["Engineer", "Intern", "Manager", "Employee"],
     },
   ];
 
@@ -36,6 +36,9 @@ function starterQ() {
     } else if (answers.employeeType === "Engineer") {
       console.log("Ask Engineer Questions");
       askEngineerQs();
+    } else if (answers.employeeType === "Employee") {
+      console.log("Ask Employee Questions");
+      askEmployeeQs();
     }
   });
 }
@@ -52,16 +55,15 @@ function restartQ() {
   ];
   inquirer.prompt(questions).then(function (answers) {
     console.log(answers);
-    if (answers.addAnother === true){
-        starterQ();
+    if (answers.addAnother === true) {
+      starterQ();
+    } else {
+      var finalProduct = render(teamArray);
+      fs.writeFile(outputPath, finalProduct, function (err) {
+        console.log("this is err for final product", err);
+      });
     }
-    else {
-     var finalProduct =  render(teamArray)
-     fs.writeFile(outputPath, finalProduct, function(err) {
-      console.log('this is err for final product', err)
-     })
-    }
-  })
+  });
 }
 
 function askManagerQs() {
@@ -83,10 +85,10 @@ function askManagerQs() {
     },
   ];
   inquirer.prompt(questions).then(function (answers) {
-    var manager = new Manager (answers.name, answers.email, answers.office)
-    console.log('this is the new manger we made!!',manager);
-    teamArray.push(manager)
-    restartQ()
+    var manager = new Manager(answers.name, teamArray.length+1, answers.email, answers.office);
+    console.log("this is the new manger we made!!", manager);
+    teamArray.push(manager);
+    restartQ();
   });
 }
 
@@ -109,9 +111,9 @@ function askInternQs() {
     },
   ];
   inquirer.prompt(questions).then(function (answers) {
-    var intern = new Intern (answers.name, answers.email, answers.school)
-    teamArray.push(intern)
-    restartQ()
+    var intern = new Intern(answers.name, teamArray.length+1, answers.email, answers.school);
+    teamArray.push(intern);
+    restartQ();
   });
 }
 
@@ -134,13 +136,31 @@ function askEngineerQs() {
     },
   ];
   inquirer.prompt(questions).then(function (answers) {
-    var engineer = new Engineer (answers.name, answers.email, answers.github)
-    teamArray.push(engineer)
-    restartQ()
+    var engineer = new Engineer(answers.name, teamArray.length+1, answers.email, answers.github);
+    teamArray.push(engineer);
+    restartQ();
   });
 }
 
-
+function askEmployeeQs() {
+  var questions = [
+    {
+      type: "input",
+      name: "name",
+      message: "What is your name?",
+    },
+    {
+      type: "input",
+      name: "email",
+      message: "What is your email address?",
+    },
+  ];
+  inquirer.prompt(questions).then(function (answers) {
+    var employee = new Employee(answers.name, teamArray.length+1, answers.email);
+    teamArray.push(employee);
+    restartQ();
+  });
+}
 
 // Write code to use inquirer to gather information about the development team members,
 // and to create objects for each team member (using the correct classes as blueprints!)
